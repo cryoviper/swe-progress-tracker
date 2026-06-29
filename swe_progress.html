@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /* ---- White theme tokens ---- */
+      :root {
+        --font-sans:
+          "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+
+        --color-background-primary: #ffffff;
+        --color-background-secondary: #f6f7f9;
+        --color-background-tertiary: #eef0f3;
+
+        --color-text-primary: #1a1d21;
+        --color-text-secondary: #6b7280;
+
+        --color-border-tertiary: #e7e9ee;
+        --color-border-secondary: #cfd3da;
+
+        --accent: #1d9e75;
+        --accent-soft: #e1f5ee;
+        --accent-deep: #0f6e56;
+
+        --border-radius-md: 10px;
+        --border-radius-lg: 16px;
+
+        --shadow-sm:
+          0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+        --shadow-md:
+          0 4px 12px rgba(16, 24, 40, 0.06), 0 2px 4px rgba(16, 24, 40, 0.04);
+        --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      body {
+        font-family: var(--font-sans);
+        background:
+          radial-gradient(
+            1200px 600px at 50% -10%,
+            #f3faf7 0%,
+            rgba(243, 250, 247, 0) 60%
+          ),
+          #fbfbfc;
+        color: var(--color-text-primary);
+        min-height: 100vh;
+        padding: 40px 16px 64px;
+        line-height: 1.45;
+      }
+
+      .container {
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      h2.sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+      }
+
+      /* ---- Header card ---- */
+      .header {
+        background: var(--color-background-primary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-md);
+        padding: 28px 28px 24px;
+        margin-bottom: 24px;
+      }
+      .title-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 6px;
+      }
+      .title-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, #25b487, var(--accent));
+        box-shadow: 0 4px 10px rgba(29, 158, 117, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 18px;
+      }
+      .title {
+        font-size: 22px;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+      }
+      .subtitle {
+        font-size: 13.5px;
+        color: var(--color-text-secondary);
+        margin-bottom: 20px;
+      }
+
+      .progress-bar-wrap {
+        background: var(--color-background-secondary);
+        border-radius: 99px;
+        height: 12px;
+        overflow: hidden;
+        border: 1px solid var(--color-border-tertiary);
+      }
+      .progress-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, #25b487, var(--accent));
+        transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+      }
+      .progress-bar-fill::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.35) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        opacity: 0;
+        animation: shimmer 2.2s ease-in-out infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+          opacity: 0;
+        }
+        40% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+      .progress-label {
+        font-size: 13px;
+        color: var(--color-text-secondary);
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .progress-label #global-pct {
+        font-size: 15px;
+        font-weight: 650;
+        color: var(--color-text-primary);
+      }
+
+      /* ---- Stages ---- */
+      .stages {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .stage-card {
+        background: var(--color-background-primary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        transition:
+          box-shadow 0.2s ease,
+          border-color 0.2s ease,
+          transform 0.2s ease;
+      }
+      .stage-card:hover {
+        box-shadow: var(--shadow-md);
+        border-color: #dde0e6;
+      }
+      .stage-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 18px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .stage-header:hover {
+        background: var(--color-background-secondary);
+      }
+      .stage-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 99px;
+        background: var(--color-background-secondary);
+        color: var(--color-text-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        white-space: nowrap;
+        letter-spacing: 0.01em;
+        transition: all 0.2s ease;
+      }
+      .stage-badge.done {
+        background: var(--accent-soft);
+        color: var(--accent-deep);
+        border-color: #9fdcc6;
+      }
+      .stage-title {
+        font-size: 15.5px;
+        font-weight: 600;
+        flex: 1;
+        letter-spacing: -0.01em;
+      }
+      .stage-progress-text {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        min-width: 32px;
+        text-align: right;
+      }
+      .stage-mini-bar {
+        width: 64px;
+        height: 5px;
+        background: var(--color-background-secondary);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .stage-mini-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, #25b487, var(--accent));
+        transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .chevron {
+        font-size: 12px;
+        color: var(--color-text-secondary);
+        transition: transform 0.25s ease;
+      }
+      .chevron.open {
+        transform: rotate(180deg);
+      }
+
+      .stage-body {
+        border-top: 1px solid var(--color-border-tertiary);
+        padding: 14px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        animation: fadeIn 0.25s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ---- Topics ---- */
+      .topic {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-md);
+        overflow: hidden;
+        transition: border-color 0.2s ease;
+      }
+      .topic:hover {
+        border-color: #dde0e6;
+      }
+      .topic-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 13px;
+        cursor: pointer;
+      }
+      .topic-header:hover {
+        background: var(--color-background-tertiary);
+      }
+      .topic-check {
+        width: 19px;
+        height: 19px;
+        border-radius: 6px;
+        border: 1.5px solid var(--color-border-secondary);
+        background: var(--color-background-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.15s ease;
+      }
+      .topic-check:hover {
+        border-color: var(--accent);
+      }
+      .topic-check.checked {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .topic-check.partial {
+        background: var(--color-background-primary);
+        border-color: var(--accent);
+      }
+      .topic-check svg {
+        display: none;
+      }
+      .topic-check.checked svg {
+        display: block;
+      }
+      .topic-check.partial::after {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 2px;
+        background: var(--accent);
+      }
+      .topic-name {
+        font-size: 14px;
+        font-weight: 600;
+        flex: 1;
+        letter-spacing: -0.01em;
+      }
+      .topic-count {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        background: var(--color-background-primary);
+        border: 1px solid var(--color-border-tertiary);
+        padding: 2px 8px;
+        border-radius: 99px;
+      }
+
+      .subtopics {
+        padding: 2px 13px 12px 44px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        animation: fadeIn 0.2s ease;
+      }
+      .subtopic {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        padding: 5px 8px;
+        border-radius: 7px;
+        transition: background 0.12s ease;
+      }
+      .subtopic:hover {
+        background: var(--color-background-tertiary);
+      }
+      .sub-check {
+        width: 17px;
+        height: 17px;
+        border-radius: 5px;
+        border: 1.5px solid var(--color-border-secondary);
+        background: var(--color-background-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.15s ease;
+      }
+      .subtopic:hover .sub-check {
+        border-color: var(--accent);
+      }
+      .sub-check.checked {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .sub-check svg {
+        display: none;
+      }
+      .sub-check.checked svg {
+        display: block;
+      }
+      .sub-label {
+        font-size: 13px;
+        color: var(--color-text-secondary);
+        transition: color 0.15s ease;
+      }
+      .sub-label.checked {
+        color: var(--color-text-secondary);
+        text-decoration: line-through;
+        opacity: 0.55;
+      }
+
+      @media (max-width: 560px) {
+        body {
+          padding: 24px 12px 48px;
+        }
+        .header {
+          padding: 22px 18px 20px;
+        }
+        .title {
+          font-size: 19px;
+        }
+        .stage-progress-text {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2 class="sr-only">
+      Software Engineering progress tracker across 13 stages
+    </h2>
+
+    <div class="container">
+      <div class="header">
+        <div class="title-row">
+          <div class="title-mark">◆</div>
+          <div class="title">Software Engineering Progress</div>
+        </div>
+        <div class="subtitle">My progress across all stages</div>
+        <div class="progress-bar-wrap">
+          <div
+            class="progress-bar-fill"
+            id="global-fill"
+            style="width: 0%"
+          ></div>
+        </div>
+        <div class="progress-label">
+          <span id="global-text">0 of 0 subtopics done</span
+          ><span id="global-pct">0%</span>
+        </div>
+      </div>
+
+      <div class="stages" id="stages-root"></div>
+    </div>
+
+    <script>
+      const ROADMAP = [
+        {
+          id: 1,
+          title: "Programming Fundamentals",
+          topics: [
+            {
+              id: "1a",
+              name: "Programming Basics",
+              subs: [
+                "Choose Java/C++/Python",
+                "Variables & Data Types",
+                "Operators",
+                "Loops",
+                "Functions",
+              ],
+            },
+            {
+              id: "1b",
+              name: "OOP",
+              subs: [
+                "Classes & Objects",
+                "Inheritance",
+                "Polymorphism",
+                "Abstraction",
+                "Encapsulation",
+              ],
+            },
+            {
+              id: "1c",
+              name: "Git & GitHub",
+              subs: [
+                "Git Basics",
+                "Branches",
+                "Pull Requests",
+                "GitHub Workflow",
+              ],
+            },
+            {
+              id: "1d",
+              name: "Projects",
+              subs: [
+                "Calculator",
+                "Number Guessing Game",
+                "Bank Management System",
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          title: "HTML & CSS",
+          topics: [
+            {
+              id: "2a",
+              name: "HTML",
+              subs: ["Semantic HTML", "Forms", "Tables", "Accessibility"],
+            },
+            {
+              id: "2b",
+              name: "CSS",
+              subs: [
+                "Selectors",
+                "Flexbox",
+                "Grid",
+                "Animations",
+                "Responsive Design",
+              ],
+            },
+            {
+              id: "2c",
+              name: "Tailwind CSS",
+              subs: ["Utility Classes", "Responsive Utilities", "Components"],
+            },
+            {
+              id: "2d",
+              name: "Projects",
+              subs: [
+                "Portfolio Website",
+                "Netflix Clone",
+                "Spotify Clone",
+                "Apple Landing Page",
+                "Linktree Clone",
+              ],
+            },
+          ],
+        },
+        {
+          id: 3,
+          title: "JavaScript",
+          topics: [
+            {
+              id: "3a",
+              name: "Core JavaScript",
+              subs: ["ES6+", "DOM", "Events", "Modules", "Fetch API"],
+            },
+            {
+              id: "3b",
+              name: "Async JS",
+              subs: ["Promises", "Async/Await", "Event Loop"],
+            },
+            {
+              id: "3c",
+              name: "Projects",
+              subs: [
+                "Weather App",
+                "Expense Tracker",
+                "Quiz App",
+                "Kanban Board",
+                "Markdown Editor",
+              ],
+            },
+          ],
+        },
+        {
+          id: 4,
+          title: "React",
+          topics: [
+            {
+              id: "4a",
+              name: "React Core",
+              subs: ["Components", "Hooks", "Routing", "Context API"],
+            },
+            {
+              id: "4b",
+              name: "State Management",
+              subs: ["React Query", "Forms", "Performance"],
+            },
+            {
+              id: "4c",
+              name: "Projects",
+              subs: [
+                "Notes App",
+                "Movie App",
+                "Habit Tracker",
+                "AI Chat UI",
+                "Trello Clone",
+              ],
+            },
+          ],
+        },
+        {
+          id: 5,
+          title: "Backend Development",
+          topics: [
+            {
+              id: "5a",
+              name: "Node.js & Express",
+              subs: ["REST APIs", "Middleware", "Authentication", "JWT"],
+            },
+            {
+              id: "5b",
+              name: "Databases",
+              subs: ["PostgreSQL", "Prisma", "Redis", "MongoDB"],
+            },
+            {
+              id: "5c",
+              name: "Projects",
+              subs: [
+                "URL Shortener",
+                "Blog API",
+                "Expense Tracker API",
+                "Chat Backend",
+              ],
+            },
+          ],
+        },
+        {
+          id: 6,
+          title: "Full Stack Development",
+          topics: [
+            {
+              id: "6a",
+              name: "Next.js",
+              subs: ["App Router", "Server Components", "Deployment"],
+            },
+            {
+              id: "6b",
+              name: "Projects",
+              subs: [
+                "E-Commerce",
+                "LMS",
+                "Social Media App",
+                "AI SaaS",
+                "OpenDrill Style Project",
+              ],
+            },
+          ],
+        },
+        {
+          id: 7,
+          title: "DSA",
+          topics: [
+            {
+              id: "7a",
+              name: "Core Topics",
+              subs: [
+                "Arrays",
+                "Strings",
+                "HashMap",
+                "Two Pointers",
+                "Sliding Window",
+                "Binary Search",
+                "Stack",
+                "Queue",
+                "Linked List",
+                "Trees",
+                "Heap",
+                "Graphs",
+                "Dynamic Programming",
+              ],
+            },
+            { id: "7b", name: "Project", subs: ["DSA Visualizer"] },
+          ],
+        },
+        {
+          id: 8,
+          title: "AI / ML",
+          topics: [
+            {
+              id: "8a",
+              name: "Foundations",
+              subs: [
+                "Python",
+                "NumPy",
+                "Pandas",
+                "Linear Algebra",
+                "Probability",
+              ],
+            },
+            {
+              id: "8b",
+              name: "Machine Learning",
+              subs: [
+                "Regression",
+                "Classification",
+                "Neural Networks",
+                "PyTorch",
+              ],
+            },
+            {
+              id: "8c",
+              name: "Projects",
+              subs: [
+                "Resume Analyzer",
+                "Chatbot",
+                "PDF QA",
+                "AI Interviewer",
+                "AI Notes Generator",
+              ],
+            },
+          ],
+        },
+        {
+          id: 9,
+          title: "Cloud & DevOps",
+          topics: [
+            {
+              id: "9a",
+              name: "Cloud",
+              subs: [
+                "Docker",
+                "CI/CD",
+                "GitHub Actions",
+                "AWS/GCP",
+                "Deployment",
+              ],
+            },
+            {
+              id: "9b",
+              name: "Projects",
+              subs: ["Deploy Every Project", "Dockerize Apps"],
+            },
+          ],
+        },
+        {
+          id: 10,
+          title: "System Design",
+          topics: [
+            {
+              id: "10a",
+              name: "Concepts",
+              subs: [
+                "Caching",
+                "Load Balancer",
+                "Queues",
+                "Databases",
+                "Scaling",
+              ],
+            },
+            {
+              id: "10b",
+              name: "Practice",
+              subs: [
+                "Design WhatsApp",
+                "Design Instagram",
+                "Design YouTube",
+                "Design Uber",
+              ],
+            },
+          ],
+        },
+        {
+          id: 11,
+          title: "Open Source",
+          topics: [
+            {
+              id: "11a",
+              name: "GitHub",
+              subs: [
+                "Read Source Code",
+                "First PR",
+                "Maintain a Repo",
+                "Build GitHub App",
+              ],
+            },
+          ],
+        },
+        {
+          id: 12,
+          title: "Mobile & Desktop",
+          topics: [
+            {
+              id: "12a",
+              name: "React Native",
+              subs: ["Navigation", "Native Modules", "Deployment"],
+            },
+            { id: "12b", name: "Desktop", subs: ["Electron", "Tauri"] },
+            {
+              id: "12c",
+              name: "Project",
+              subs: ["Desktop Version of Your Best App"],
+            },
+          ],
+        },
+        {
+          id: 13,
+          title: "Advanced Topics",
+          topics: [
+            {
+              id: "13a",
+              name: "Explore",
+              subs: [
+                "Rust",
+                "Compilers",
+                "System Internals",
+                "Terminal Tools",
+                "Language Design",
+              ],
+            },
+          ],
+        },
+      ];
+
+      const STORAGE_KEY = "swe_progress_v1";
+
+      function load() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        } catch {
+          return {};
+        }
+      }
+      function save(state) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch {}
+      }
+
+      let state = load();
+      let openStages = {};
+      let openTopics = {};
+
+      function getSubKey(stageId, topicId, subIdx) {
+        return `${stageId}_${topicId}_${subIdx}`;
+      }
+
+      function isSubDone(stageId, topicId, subIdx) {
+        return !!state[getSubKey(stageId, topicId, subIdx)];
+      }
+
+      function toggleSub(stageId, topicId, subIdx) {
+        const k = getSubKey(stageId, topicId, subIdx);
+        state[k] = !state[k];
+        save(state);
+        render();
+      }
+
+      function toggleAllTopic(stageId, topicId, subs) {
+        const allDone = subs.every((_, i) => isSubDone(stageId, topicId, i));
+        subs.forEach((_, i) => {
+          state[getSubKey(stageId, topicId, i)] = !allDone;
+        });
+        save(state);
+        render();
+      }
+
+      function globalStats() {
+        let total = 0,
+          done = 0;
+        ROADMAP.forEach((s) =>
+          s.topics.forEach((t) => {
+            total += t.subs.length;
+            t.subs.forEach((_, i) => {
+              if (isSubDone(s.id, t.id, i)) done++;
+            });
+          }),
+        );
+        return { total, done };
+      }
+
+      function stageStats(stage) {
+        let total = 0,
+          done = 0;
+        stage.topics.forEach((t) => {
+          total += t.subs.length;
+          t.subs.forEach((_, i) => {
+            if (isSubDone(stage.id, t.id, i)) done++;
+          });
+        });
+        return { total, done };
+      }
+
+      function topicStats(stageId, topic) {
+        let done = topic.subs.filter((_, i) =>
+          isSubDone(stageId, topic.id, i),
+        ).length;
+        return { total: topic.subs.length, done };
+      }
+
+      function checkSVG() {
+        return `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 4,7 9,1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      }
+
+      function render() {
+        const { total, done } = globalStats();
+        const pct = total ? Math.round((done / total) * 100) : 0;
+        document.getElementById("global-fill").style.width = pct + "%";
+        document.getElementById("global-text").textContent =
+          `${done} of ${total} subtopics done`;
+        document.getElementById("global-pct").textContent = pct + "%";
+
+        const root = document.getElementById("stages-root");
+        root.innerHTML = ROADMAP.map((stage) => {
+          const ss = stageStats(stage);
+          const sPct = ss.total ? Math.round((ss.done / ss.total) * 100) : 0;
+          const isOpen = !!openStages[stage.id];
+          const allDone = ss.done === ss.total;
+
+          const topicsHTML = isOpen
+            ? `<div class="stage-body">${stage.topics
+                .map((topic) => {
+                  const ts = topicStats(stage.id, topic);
+                  const tOpen = !!openTopics[topic.id];
+                  const allSubsDone = ts.done === ts.total;
+                  const someSubsDone = ts.done > 0 && ts.done < ts.total;
+                  const checkClass = allSubsDone
+                    ? "checked"
+                    : someSubsDone
+                      ? "partial"
+                      : "";
+
+                  const subsHTML = tOpen
+                    ? `<div class="subtopics">${topic.subs
+                        .map((sub, i) => {
+                          const done = isSubDone(stage.id, topic.id, i);
+                          return `<div class="subtopic" onclick="toggleSub(${stage.id}, '${topic.id}', ${i})">
+          <div class="sub-check ${done ? "checked" : ""}">${done ? checkSVG() : ""}</div>
+          <span class="sub-label ${done ? "checked" : ""}">${sub}</span>
+        </div>`;
+                        })
+                        .join("")}</div>`
+                    : "";
+
+                  return `<div class="topic">
+        <div class="topic-header" onclick="toggleTopic('${topic.id}')">
+          <div class="topic-check ${checkClass}" onclick="event.stopPropagation(); toggleAllTopic(${stage.id}, '${topic.id}', ${JSON.stringify(topic.subs)})">${allSubsDone ? checkSVG() : ""}</div>
+          <span class="topic-name">${topic.name}</span>
+          <span class="topic-count">${ts.done}/${ts.total}</span>
+          <span class="chevron ${tOpen ? "open" : ""}">▾</span>
+        </div>
+        ${subsHTML}
+      </div>`;
+                })
+                .join("")}</div>`
+            : "";
+
+          return `<div class="stage-card">
+      <div class="stage-header" onclick="toggleStage(${stage.id})">
+        <span class="stage-badge ${allDone ? "done" : ""}">Stage ${stage.id}</span>
+        <span class="stage-title">${stage.title}</span>
+        <span class="stage-progress-text">${sPct}%</span>
+        <div class="stage-mini-bar"><div class="stage-mini-fill" style="width:${sPct}%"></div></div>
+        <span class="chevron ${isOpen ? "open" : ""}">▾</span>
+      </div>
+      ${topicsHTML}
+    </div>`;
+        }).join("");
+      }
+
+      function toggleStage(id) {
+        openStages[id] = !openStages[id];
+        render();
+      }
+      function toggleTopic(id) {
+        openTopics[id] = !openTopics[id];
+        render();
+      }
+
+      render();
+    </script>
+  </body>
+</html>
